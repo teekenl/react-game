@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import classNames from 'classnames';
 class Quiz extends Component {
     constructor(props){
         super(props);
@@ -9,6 +9,7 @@ class Quiz extends Component {
         this.state ={riddle,correct,gameover};
         this.renderOptions = this.renderOptions.bind(this);
         this.checkResults = this.checkResults.bind(this);
+        this.play = this.play.bind(this);
     }
 
     checkResults(option){
@@ -68,15 +69,29 @@ class Quiz extends Component {
         resultArray.sort(function(a,b){
             return 0.5 - Math.random();
         });
-
-        return{
+        let riddle =  {
             resultArray: resultArray,
             field1: field1,
             field2: field2,
             answer: result
         };
+
+        if(this.state && this.state.gameover) {
+            this.setState({
+                riddle:riddle
+            });
+        } else{
+            return riddle;
+        }
     }
 
+    renderMessage(){
+        if(this.state.correct){
+            return <h3>Good Job! Hit the button below to Play Again. </h3>
+        } else{
+            return <h3>Ohhh Ohh!! Hit the button below to Play Again. </h3>
+        }
+    }
     renderOptions(){
         return (
             <div className="options">
@@ -87,6 +102,15 @@ class Quiz extends Component {
             </div>
         )
     }
+
+    play(){
+        this.setState({
+            correct:false,
+            gameover:false
+        });
+        this.playGame();
+    }
+
     render(){
         return(
             <div className="quiz">
@@ -97,8 +121,11 @@ class Quiz extends Component {
                     {this.renderOptions()}
                     Correct: {this.state.correct ? "Correct" : "Wrong"}<br/>
                     Game Over: {this.state.gameover ? "Yes" : "No"}<br/>
+                    <div className={classNames("after ",{'hide': !this.state.gameover},{'wrong animated zoomInDown':!this.state.correct},{'correct animated zoomInDown':this.state.correct})}>
+                        {this.renderMessage()}
+                    </div>
                     <div className="play-again">
-                        <a className="button">Play again</a>
+                        <a className="button" onClick={this.play}>Play again</a>
                     </div>
                 </div>
             </div>
@@ -118,7 +145,7 @@ class QuizOptions extends Component {
     }
     render(){
         return(
-            <div className="fields" onClick={this.callParentCheckOptions}>
+            <div className="fields animated zoomIn" onClick={this.callParentCheckOptions}>
                 <div className="field-block">{this.props.options}</div></div>
         );
     }
